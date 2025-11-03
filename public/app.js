@@ -67,7 +67,7 @@ async function startCheck() {
     try {
         const maxPages = document.getElementById('maxPagesToggle').checked 
             ? parseInt(document.getElementById('maxPages').value) 
-            : 100;
+            : 500;
 
         // Show loading stages with animated progress
         let progressPercent = 0;

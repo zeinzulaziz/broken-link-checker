@@ -63,7 +63,7 @@ function isInternalUrl(url, baseDomain) {
 }
 
 // Crawl website dan ekstrak semua links
-async function crawlWebsite(startUrl, maxPages = 100) {
+async function crawlWebsite(startUrl, maxPages = 500) {
   const visited = new Set();
   const toVisit = [startUrl];
   const links = new Map(); // Map<url, Set<link>>
@@ -227,7 +227,7 @@ async function checkLinksParallel(urls, concurrency = 10) {
 
 // API: Check broken links
 app.post('/api/check', async (req, res) => {
-  const { url, maxPages = 100 } = req.body;
+  const { url, maxPages = 500 } = req.body;
   
   if (!url) {
     return res.status(400).json({ error: 'URL is required' });
