@@ -21,10 +21,10 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #764ba2;
     min-height: 100vh;
     color: var(--text-primary);
-    padding: 20px;
+    padding: 1.5rem;
     font-size: 0.8rem;
     border-radius: 20px;
 }
@@ -39,7 +39,7 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     color: white;
     padding: 40px 30px;
     text-align: center;
