@@ -211,11 +211,9 @@ main {
 }
 
 .progress-text {
-    position: absolute;
     width: 100%;
     text-align: center;
     line-height: 30px;
-    color: white;
     font-weight: 600;
     font-size: 0.9rem;
 }
