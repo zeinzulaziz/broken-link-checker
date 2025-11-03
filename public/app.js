@@ -156,81 +156,156 @@ async function startCheck() {
     let progressInterval = null;
 
     try {
-        const maxPages = document.getElementById('maxPagesToggle').checked 
+        const totalMaxPages = document.getElementById('maxPagesToggle').checked 
             ? parseInt(document.getElementById('maxPages').value) 
-            : 200;
-
-        // Show loading stages with animated progress
-        let progressPercent = 0;
-        let pagesScanned = 0;
-        let linksScanned = 0;
-        let linksRemaining = 0;
+            : 500;
         
-        // Animate progress bar while waiting
-        progressInterval = setInterval(() => {
-            progressPercent += 1.5; // Increment slower for better UX
-            if (progressPercent < 95) {
-                progressFill.style.width = progressPercent + '%';
-                
-                // Simulate scanning progress with more realistic numbers
-                if (progressPercent < 25) {
-                    pagesScanned = Math.floor(progressPercent * 2);
-                    linksScanned = Math.floor(progressPercent * 4);
-                    linksRemaining = 250 + Math.floor(progressPercent * 10);
-                    progressText.textContent = `Crawling website... ${pagesScanned} pages scanned, ${linksScanned} links found`;
-                } else if (progressPercent < 65) {
-                    pagesScanned = 50 + Math.floor((progressPercent - 25) * 3);
-                    linksScanned = 100 + Math.floor((progressPercent - 25) * 8);
-                    linksRemaining = Math.max(0, 350 - Math.floor((progressPercent - 25) * 5));
-                    progressText.textContent = `Checking ${linksScanned} links... ${linksRemaining} remaining`;
-                } else {
-                    linksScanned = 420 + Math.floor((progressPercent - 65) * 5);
-                    linksRemaining = Math.max(0, 80 - Math.floor((progressPercent - 65) * 2));
-                    progressText.textContent = `Finalizing... ${linksScanned} links checked, ${linksRemaining} remaining`;
-                }
-            }
-        }, 300);
+        // Batch processing: split into smaller chunks to avoid timeout
+        const BATCH_SIZE = 100; // Pages per batch
+        const batches = Math.ceil(totalMaxPages / BATCH_SIZE);
+        
+        progressText.textContent = `Preparing to scan up to ${totalMaxPages} pages in ${batches} batch(es)...`;
 
-        // Start fetching
-        const response = await fetch('/api/check', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ url, maxPages })
-        });
+        // Accumulate results
+        let allResults = {
+            totalPages: 0,
+            totalLinks: 0,
+            brokenLinks: 0,
+            workingLinks: 0,
+            brokenLinksDetails: [],
+            baseDomain: '',
+            allLinks: new Set()
+        };
 
-        if (!response.ok) {
-            let errorMessage = 'Failed to check links';
+        // State for batch continuation
+        let visitedUrls = [];
+        let nextUrlsToVisit = [];
+        let hasMoreBatches = true;
+
+        // Process each batch
+        for (let batchIndex = 0; batchIndex < batches && hasMoreBatches; batchIndex++) {
+            const batchMaxPages = Math.min(BATCH_SIZE, totalMaxPages - (batchIndex * BATCH_SIZE));
+            const batchNumber = batchIndex + 1;
+            
+            progressText.textContent = `Processing batch ${batchNumber}/${batches} (up to ${batchMaxPages} pages)...`;
+            progressFill.style.width = `${(batchIndex / batches) * 95}%`;
+
             try {
-                const error = await response.json();
-                errorMessage = error.error || error.message || errorMessage;
-            } catch (e) {
-                // If response is not JSON, use status text
-                if (response.status === 504) {
-                    errorMessage = 'Request timeout. The crawling process took too long. Try reducing the number of pages to scan or check a smaller website.';
-                } else if (response.status === 408) {
-                    errorMessage = 'Request timeout. Please try again with fewer pages.';
-                } else {
-                    errorMessage = `Server error (${response.status}). Please try again.`;
+                const response = await fetch('/api/check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        url, 
+                        maxPages: batchMaxPages,
+                        visitedUrls: visitedUrls,
+                        nextUrlsToVisit: nextUrlsToVisit
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMessage = 'Failed to check links';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.error || error.message || errorMessage;
+                    } catch (e) {
+                        if (response.status === 504 || response.status === 408) {
+                            errorMessage = `Batch ${batchNumber} timed out. Continuing with next batch...`;
+                            console.warn(errorMessage);
+                            // Continue to next batch instead of failing completely
+                            continue;
+                        } else {
+                            errorMessage = `Server error (${response.status}). Please try again.`;
+                        }
+                    }
+                    if (response.status !== 504 && response.status !== 408) {
+                        throw new Error(errorMessage);
+                    }
+                    // For timeout errors, log and continue
+                    console.warn(`Batch ${batchNumber} failed: ${errorMessage}`);
+                    continue;
+                }
+
+                const batchData = await response.json();
+                
+                // Save state for next batch
+                if (batchData.visitedUrls) {
+                    visitedUrls = batchData.visitedUrls;
+                }
+                if (batchData.nextUrlsToVisit) {
+                    nextUrlsToVisit = batchData.nextUrlsToVisit;
+                }
+                hasMoreBatches = batchData.hasMore !== false && nextUrlsToVisit.length > 0;
+                
+                // Merge batch results
+                allResults.totalPages += batchData.totalPages || 0;
+                
+                // Track unique links to avoid duplicates (links can appear on multiple pages)
+                const uniqueLinksInBatch = new Set();
+                if (batchData.brokenLinksDetails) {
+                    batchData.brokenLinksDetails.forEach(link => {
+                        const linkKey = `${link.url}|${link.page}`;
+                        const linkUrl = link.url;
+                        
+                        // Add to unique links set
+                        uniqueLinksInBatch.add(linkUrl);
+                        allResults.allLinks.add(linkUrl);
+                        
+                        // Add to broken links details if not duplicate
+                        if (!allResults.brokenLinksDetails.some(l => l.url === link.url && l.page === link.page)) {
+                            allResults.brokenLinksDetails.push(link);
+                        }
+                    });
+                }
+                
+                // Update totalLinks to be the total unique links found so far
+                allResults.totalLinks = allResults.allLinks.size;
+                
+                // Update counts
+                allResults.brokenLinks = allResults.brokenLinksDetails.length;
+                allResults.workingLinks = Math.max(0, allResults.totalLinks - allResults.brokenLinks);
+                
+                if (!allResults.baseDomain && batchData.baseDomain) {
+                    allResults.baseDomain = batchData.baseDomain;
+                }
+
+                // Update progress
+                progressFill.style.width = `${((batchIndex + 1) / batches) * 95}%`;
+                const remainingBatches = hasMoreBatches ? ` (${nextUrlsToVisit.length} pages remaining)` : '';
+                progressText.textContent = `Batch ${batchNumber}/${batches} complete. Found ${allResults.brokenLinks} broken links so far${remainingBatches}...`;
+                
+                // Stop if no more pages to crawl
+                if (!hasMoreBatches && batchIndex < batches - 1) {
+                    progressText.textContent = `All pages crawled! Found ${allResults.brokenLinks} broken links total.`;
+                    break;
+                }
+                
+                // Small delay between batches to avoid overwhelming server
+                if (batchIndex < batches - 1 && hasMoreBatches) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+            } catch (error) {
+                console.error(`Error in batch ${batchNumber}:`, error);
+                // Continue with next batch even if one fails
+                if (error.message && !error.message.includes('timeout')) {
+                    throw error;
                 }
             }
-            throw new Error(errorMessage);
         }
-
-        const data = await response.json();
         
         clearInterval(progressInterval);
         progressFill.style.width = '100%';
-        progressText.textContent = 'Complete!';
+        progressText.textContent = `Complete! Scanned ${allResults.totalPages} pages, found ${allResults.brokenLinks} broken links`;
         
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // Save URL to history
         saveUrlToHistory(url);
 
-        currentResults = data;
-        displayResults(data);
+        currentResults = allResults;
+        displayResults(allResults);
         
         progressBar.style.display = 'none';
         results.style.display = 'block';

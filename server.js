@@ -72,9 +72,9 @@ function isInternalUrl(url, baseDomain) {
 }
 
 // Crawl website dan ekstrak semua links
-async function crawlWebsite(startUrl, maxPages = 500) {
-  const visited = new Set();
-  const toVisit = [startUrl];
+async function crawlWebsite(startUrl, maxPages = 500, existingVisited = [], existingToVisit = []) {
+  const visited = new Set(existingVisited);
+  const toVisit = existingToVisit.length > 0 ? [...existingToVisit] : [startUrl];
   const links = new Map(); // Map<url, Set<link>>
   const pageData = new Map(); // Map<url, {status, html}>
   const linkMetadata = new Map(); // Map<url, Array<{pageUrl, linkText, pageTitle}>>
@@ -165,7 +165,14 @@ async function crawlWebsite(startUrl, maxPages = 500) {
     }
   }
 
-  return { links, pageData, baseDomain, linkMetadata };
+  return { 
+    links, 
+    pageData, 
+    baseDomain, 
+    linkMetadata,
+    visitedUrls: Array.from(visited),
+    nextUrlsToVisit: toVisit.slice(0, maxPages) // Limit next URLs to avoid huge payload
+  };
 }
 
 // Check status sebuah URL
@@ -244,7 +251,7 @@ app.get('/api/check', (req, res) => {
 });
 
 app.post('/api/check', async (req, res) => {
-  const { url, maxPages = 200 } = req.body;
+  const { url, maxPages = 200, visitedUrls = [], nextUrlsToVisit = [] } = req.body;
   
   if (!url) {
     return res.status(400).json({ error: 'URL is required' });
@@ -257,9 +264,9 @@ app.post('/api/check', async (req, res) => {
       normalizedUrl = 'https://' + normalizedUrl;
     }
 
-    // Crawl website
-    console.log(`Crawling ${normalizedUrl}...`);
-    const { links, pageData, baseDomain, linkMetadata } = await crawlWebsite(normalizedUrl, maxPages);
+    // Crawl website (resume from previous batch if provided)
+    console.log(`Crawling ${normalizedUrl}... (${visitedUrls.length} already visited)`);
+    const { links, pageData, baseDomain, linkMetadata, visitedUrls: newVisitedUrls, nextUrlsToVisit: newNextUrlsToVisit } = await crawlWebsite(normalizedUrl, maxPages, visitedUrls, nextUrlsToVisit);
 
     // Collect semua unique links
     const allLinks = new Set();
@@ -337,12 +344,17 @@ app.post('/api/check', async (req, res) => {
 
     const result = {
       startUrl: normalizedUrl,
+      baseDomain,
       totalPages: pageData.size,
       totalLinks: allLinks.size,
       brokenLinks: brokenLinks.length,
       workingLinks: workingLinks.length,
       brokenLinksDetails: brokenLinks,
       workingLinksDetails: workingLinks,
+      // Include state for batch continuation
+      visitedUrls: newVisitedUrls,
+      nextUrlsToVisit: newNextUrlsToVisit,
+      hasMore: newNextUrlsToVisit.length > 0,
       summary: {
         internalBroken: brokenLinks.filter(l => l.isInternal).length,
         externalBroken: brokenLinks.filter(l => !l.isInternal).length,
