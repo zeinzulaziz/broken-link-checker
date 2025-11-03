@@ -158,7 +158,7 @@ async function startCheck() {
     try {
         const maxPages = document.getElementById('maxPagesToggle').checked 
             ? parseInt(document.getElementById('maxPages').value) 
-            : 500;
+            : 200;
 
         // Show loading stages with animated progress
         let progressPercent = 0;
@@ -201,8 +201,21 @@ async function startCheck() {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to check links');
+            let errorMessage = 'Failed to check links';
+            try {
+                const error = await response.json();
+                errorMessage = error.error || error.message || errorMessage;
+            } catch (e) {
+                // If response is not JSON, use status text
+                if (response.status === 504) {
+                    errorMessage = 'Request timeout. The crawling process took too long. Try reducing the number of pages to scan or check a smaller website.';
+                } else if (response.status === 408) {
+                    errorMessage = 'Request timeout. Please try again with fewer pages.';
+                } else {
+                    errorMessage = `Server error (${response.status}). Please try again.`;
+                }
+            }
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();

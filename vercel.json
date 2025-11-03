@@ -1,4 +1,9 @@
 {
-  "version": 2
+  "version": 2,
+  "functions": {
+    "server.js": {
+      "maxDuration": 60
+    }
+  }
 }
 

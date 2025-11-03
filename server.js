@@ -235,8 +235,16 @@ async function checkLinksParallel(urls, concurrency = 10) {
 }
 
 // API: Check broken links
+// Handle GET request to /api/check (for info)
+app.get('/api/check', (req, res) => {
+  res.status(405).json({ 
+    error: 'Method not allowed. Please use POST method.',
+    message: 'This endpoint only accepts POST requests with a JSON body containing { url, maxPages }'
+  });
+});
+
 app.post('/api/check', async (req, res) => {
-  const { url, maxPages = 500 } = req.body;
+  const { url, maxPages = 200 } = req.body;
   
   if (!url) {
     return res.status(400).json({ error: 'URL is required' });
