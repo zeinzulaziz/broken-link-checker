@@ -47,14 +47,14 @@ async function startCheck() {
     progressFill.style.width = '0%';
     progressText.textContent = 'Initializing...';
 
+    let progressInterval = null;
+
     try {
         const maxPages = document.getElementById('maxPagesToggle').checked 
             ? parseInt(document.getElementById('maxPages').value) 
             : 100;
 
-        progressText.textContent = 'Crawling website...';
-        progressFill.style.width = '30%';
-
+        // Start fetching
         const response = await fetch('/api/check', {
             method: 'POST',
             headers: {
@@ -68,11 +68,23 @@ async function startCheck() {
             throw new Error(error.error || 'Failed to check links');
         }
 
-        progressText.textContent = 'Checking links...';
-        progressFill.style.width = '60%';
+        // Show loading stages
+        progressFill.style.width = '30%';
+        progressText.textContent = 'Crawling and analyzing website...';
+        
+        // Animate progress bar while waiting
+        progressInterval = setInterval(() => {
+            const currentWidth = parseInt(progressFill.style.width);
+            if (currentWidth < 90) {
+                progressFill.style.width = (currentWidth + 5) + '%';
+                const pagesText = currentWidth < 50 ? 'Crawling website...' : 'Checking links...';
+                progressText.textContent = pagesText;
+            }
+        }, 300);
 
         const data = await response.json();
-
+        
+        clearInterval(progressInterval);
         progressFill.style.width = '100%';
         progressText.textContent = 'Complete!';
         
@@ -88,6 +100,7 @@ async function startCheck() {
         showError(error.message || 'An error occurred while checking links');
         progressBar.style.display = 'none';
     } finally {
+        if (progressInterval) clearInterval(progressInterval);
         checkBtn.disabled = false;
         btnText.textContent = 'Find Broken Links';
         btnLoader.style.display = 'none';
