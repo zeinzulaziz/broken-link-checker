@@ -279,7 +279,9 @@ document.getElementById('exportCSVBtn').addEventListener('click', () => {
         ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
     ].join('\n');
 
-    const dataBlob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    // Add BOM for Excel compatibility
+    const BOM = '\uFEFF';
+    const dataBlob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
