@@ -1,5 +1,6 @@
 let currentResults = null;
 let currentFilter = 'all';
+let currentStatusFilter = 'all';
 
 // Elements
 const urlInput = document.getElementById('urlInput');
@@ -13,6 +14,7 @@ const results = document.getElementById('results');
 const errorMessage = document.getElementById('errorMessage');
 const brokenLinksList = document.getElementById('brokenLinksList');
 const statusMessage = document.getElementById('statusMessage');
+const statusFilter = document.getElementById('statusFilter');
 
 // Event listeners
 checkBtn.addEventListener('click', startCheck);
@@ -28,6 +30,12 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
         currentFilter = btn.dataset.filter;
         displayResults(currentResults);
     });
+});
+
+// Status filter dropdown
+statusFilter.addEventListener('change', () => {
+    currentStatusFilter = statusFilter.value;
+    displayResults(currentResults);
 });
 
 async function startCheck() {
@@ -46,6 +54,13 @@ async function startCheck() {
     progressBar.style.display = 'block';
     progressFill.style.width = '0%';
     progressText.textContent = 'Initializing...';
+    
+    // Reset filters
+    currentFilter = 'all';
+    currentStatusFilter = 'all';
+    statusFilter.value = 'all';
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.filter-btn[data-filter="all"]')?.classList.add('active');
 
     let progressInterval = null;
 
@@ -129,10 +144,17 @@ function displayResults(data) {
     // Filter broken links
     let filteredLinks = data.brokenLinksDetails || [];
     
+    // Filter by internal/external
     if (currentFilter === 'internal') {
         filteredLinks = filteredLinks.filter(link => link.isInternal);
     } else if (currentFilter === 'external') {
         filteredLinks = filteredLinks.filter(link => !link.isInternal);
+    }
+    
+    // Filter by status code
+    if (currentStatusFilter !== 'all') {
+        const statusCode = parseInt(currentStatusFilter);
+        filteredLinks = filteredLinks.filter(link => link.status === statusCode);
     }
 
     // Display broken links
