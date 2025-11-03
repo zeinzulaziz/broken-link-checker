@@ -374,7 +374,13 @@ app.post('/api/link-details', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Broken Link Checker server running on http://localhost:${PORT}`);
-});
+// Export untuk Vercel
+module.exports = app;
+
+// Untuk local development
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Broken Link Checker server running on http://localhost:${PORT}`);
+  });
+}
 
