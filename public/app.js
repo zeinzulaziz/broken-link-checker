@@ -171,8 +171,10 @@ async function startCheck() {
             brokenLinks: 0,
             workingLinks: 0,
             brokenLinksDetails: [],
+            workingLinksDetails: [],
             baseDomain: '',
-            allLinks: new Set()
+            allUniqueLinks: new Set(), // Track all unique link URLs across batches
+            allLinkDetails: new Map() // Track link details by url+page key
         };
 
         // State for batch continuation
@@ -267,30 +269,64 @@ async function startCheck() {
                 // Merge batch results
                 allResults.totalPages += batchData.totalPages || 0;
                 
-                // Track unique links to avoid duplicates (links can appear on multiple pages)
-                const uniqueLinksInBatch = new Set();
-                if (batchData.brokenLinksDetails) {
+                // Collect all unique link URLs from this batch
+                const batchLinks = new Set();
+                
+                // Process broken links from this batch
+                if (batchData.brokenLinksDetails && Array.isArray(batchData.brokenLinksDetails)) {
                     batchData.brokenLinksDetails.forEach(link => {
                         const linkKey = `${link.url}|${link.page}`;
-                        const linkUrl = link.url;
+                        batchLinks.add(link.url);
+                        allResults.allUniqueLinks.add(link.url);
                         
-                        // Add to unique links set
-                        uniqueLinksInBatch.add(linkUrl);
-                        allResults.allLinks.add(linkUrl);
-                        
-                        // Add to broken links details if not duplicate
-                        if (!allResults.brokenLinksDetails.some(l => l.url === link.url && l.page === link.page)) {
+                        // Add to broken links details if not duplicate (by url+page)
+                        if (!allResults.allLinkDetails.has(linkKey)) {
+                            allResults.allLinkDetails.set(linkKey, link);
                             allResults.brokenLinksDetails.push(link);
                         }
                     });
                 }
                 
-                // Update totalLinks to be the total unique links found so far
-                allResults.totalLinks = allResults.allLinks.size;
+                // Process working links from this batch
+                if (batchData.workingLinksDetails && Array.isArray(batchData.workingLinksDetails)) {
+                    batchData.workingLinksDetails.forEach(link => {
+                        const linkKey = `${link.url}|${link.page}`;
+                        batchLinks.add(link.url);
+                        allResults.allUniqueLinks.add(link.url);
+                        
+                        // Add to working links details if not duplicate (by url+page)
+                        if (!allResults.allLinkDetails.has(linkKey)) {
+                            allResults.allLinkDetails.set(linkKey, link);
+                            allResults.workingLinksDetails.push(link);
+                        }
+                    });
+                }
                 
-                // Update counts
-                allResults.brokenLinks = allResults.brokenLinksDetails.length;
-                allResults.workingLinks = Math.max(0, allResults.totalLinks - allResults.brokenLinks);
+                // Update counts based on accumulated data
+                // totalLinks should be the count of unique link URLs (not occurrences)
+                allResults.totalLinks = allResults.allUniqueLinks.size;
+                
+                // Count unique broken and working links (not occurrences)
+                const uniqueBrokenLinks = new Set();
+                const uniqueWorkingLinks = new Set();
+                
+                allResults.brokenLinksDetails.forEach(link => {
+                    uniqueBrokenLinks.add(link.url);
+                });
+                
+                allResults.workingLinksDetails.forEach(link => {
+                    uniqueWorkingLinks.add(link.url);
+                });
+                
+                allResults.brokenLinks = uniqueBrokenLinks.size;
+                allResults.workingLinks = uniqueWorkingLinks.size;
+                
+                // Fallback: if workingLinks seems wrong, recalculate from totalLinks
+                if (allResults.totalLinks > 0 && allResults.brokenLinks + allResults.workingLinks > allResults.totalLinks) {
+                    // Some links might appear in both broken and working (edge case)
+                    // Recalculate workingLinks from totalLinks
+                    allResults.workingLinks = Math.max(0, allResults.totalLinks - allResults.brokenLinks);
+                }
                 
                 if (!allResults.baseDomain && batchData.baseDomain) {
                     allResults.baseDomain = batchData.baseDomain;
