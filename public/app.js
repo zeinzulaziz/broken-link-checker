@@ -263,15 +263,12 @@ document.getElementById('exportBtn').addEventListener('click', () => {
 document.getElementById('exportCSVBtn').addEventListener('click', () => {
     if (!currentResults || !currentResults.brokenLinksDetails) return;
     
-    const headers = ['URL', 'Status', 'Status Text', 'Page', 'Page Title', 'Is Internal', 'Error'];
+    const headers = ['Broken Link', 'Link Text', 'Page Where Found', 'Server Response'];
     const rows = currentResults.brokenLinksDetails.map(link => [
         link.url,
-        link.status || '',
-        link.statusText || '',
+        link.linkText || '',
         link.page || '',
-        link.pageTitle || '',
-        link.isInternal ? 'Yes' : 'No',
-        link.error || ''
+        link.statusText || link.error || link.status || ''
     ]);
 
     const csv = [
