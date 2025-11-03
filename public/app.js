@@ -205,7 +205,7 @@ function displayResults(data) {
         }
         
         tableHTML += `
-            <tr>
+            <tr class="result-row">
                 <td>${index + 1}</td>
                 <td class="broken-link">
                     <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a>
@@ -230,6 +230,19 @@ function displayResults(data) {
     `;
     
     brokenLinksList.innerHTML = tableHTML;
+    
+    // Add click handlers for row selection
+    document.querySelectorAll('.result-row').forEach(row => {
+        row.addEventListener('click', (e) => {
+            // Don't trigger selection if clicking on links
+            if (e.target.tagName === 'A' || e.target.tagName === 'SPAN') return;
+            
+            // Remove selection from other rows
+            document.querySelectorAll('.result-row').forEach(r => r.classList.remove('selected'));
+            // Add selection to clicked row
+            row.classList.add('selected');
+        });
+    });
     
     // Update status message
     const statusSummary = document.querySelector('.status-summary');
