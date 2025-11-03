@@ -74,8 +74,13 @@ main {
     margin-bottom: 15px;
 }
 
-#urlInput {
+.url-input-wrapper {
     flex: 1;
+    position: relative;
+}
+
+#urlInput {
+    width: 100%;
     padding: 15px 20px;
     border: 2px solid var(--border-color);
     border-radius: 10px;
@@ -87,6 +92,66 @@ main {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.url-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid var(--primary-color);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.url-suggestions.show {
+    display: block;
+}
+
+.suggestion-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #f1f5f9;
+}
+
+.suggestion-item .icon {
+    font-size: 1.2rem;
+}
+
+.suggestion-item .url {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.suggestion-item .delete-btn {
+    font-size: 1.2rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    padding: 2px 6px;
+}
+
+.suggestion-item .delete-btn:hover {
+    opacity: 1;
+    color: var(--danger-color);
 }
 
 .btn-primary {

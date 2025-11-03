@@ -15,11 +15,94 @@ const errorMessage = document.getElementById('errorMessage');
 const brokenLinksList = document.getElementById('brokenLinksList');
 const statusMessage = document.getElementById('statusMessage');
 const statusFilter = document.getElementById('statusFilter');
+const urlSuggestions = document.getElementById('urlSuggestions');
+
+// URL History Functions
+function getUrlHistory() {
+    const history = localStorage.getItem('urlHistory');
+    return history ? JSON.parse(history) : [];
+}
+
+function saveUrlToHistory(url) {
+    let history = getUrlHistory();
+    // Remove if already exists
+    history = history.filter(u => u !== url);
+    // Add to beginning
+    history.unshift(url);
+    // Keep only last 20 URLs
+    history = history.slice(0, 20);
+    localStorage.setItem('urlHistory', JSON.stringify(history));
+}
+
+function deleteUrlFromHistory(url) {
+    let history = getUrlHistory();
+    history = history.filter(u => u !== url);
+    localStorage.setItem('urlHistory', JSON.stringify(history));
+    showSuggestions(urlInput.value);
+}
+
+function showSuggestions(query = '') {
+    const history = getUrlHistory();
+    if (history.length === 0 || query === '') {
+        urlSuggestions.classList.remove('show');
+        return;
+    }
+
+    const filtered = history.filter(url => 
+        url.toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+        urlSuggestions.classList.remove('show');
+        return;
+    }
+
+    urlSuggestions.innerHTML = filtered.map(url => `
+        <div class="suggestion-item">
+            <span class="icon">🔗</span>
+            <span class="url">${url}</span>
+            <span class="delete-btn" data-url="${url}">🗑️</span>
+        </div>
+    `).join('');
+
+    // Add event listeners
+    document.querySelectorAll('.suggestion-item').forEach(item => {
+        const url = item.querySelector('.url').textContent;
+        item.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                deleteUrlFromHistory(url);
+                e.stopPropagation();
+            } else {
+                urlInput.value = url;
+                urlSuggestions.classList.remove('show');
+                startCheck();
+            }
+        });
+    });
+
+    urlSuggestions.classList.add('show');
+}
 
 // Event listeners
 checkBtn.addEventListener('click', startCheck);
+urlInput.addEventListener('input', (e) => {
+    showSuggestions(e.target.value);
+});
+urlInput.addEventListener('focus', (e) => {
+    showSuggestions(e.target.value);
+});
 urlInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') startCheck();
+    if (e.key === 'Enter') {
+        urlSuggestions.classList.remove('show');
+        startCheck();
+    }
+});
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', (e) => {
+    if (!urlInput.contains(e.target) && !urlSuggestions.contains(e.target)) {
+        urlSuggestions.classList.remove('show');
+    }
 });
 
 // Filter buttons
@@ -129,6 +212,9 @@ async function startCheck() {
         progressText.textContent = 'Complete!';
         
         await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Save URL to history
+        saveUrlToHistory(url);
 
         currentResults = data;
         displayResults(data);

@@ -16,12 +16,15 @@
         <main>
             <div class="check-form">
                 <div class="input-group">
-                    <input 
-                        type="text" 
-                        id="urlInput" 
-                        placeholder="Enter your website URL (e.g., www.example.com)"
-                        autocomplete="off"
-                    >
+                    <div class="url-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="urlInput" 
+                            placeholder="Enter your website URL (e.g., www.example.com)"
+                            autocomplete="off"
+                        >
+                        <div id="urlSuggestions" class="url-suggestions"></div>
+                    </div>
                     <button id="checkBtn" class="btn-primary">
                         <span id="btnText">Find Broken Links</span>
                         <span id="btnLoader" class="loader" style="display: none;"></span>
