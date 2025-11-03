@@ -11,7 +11,7 @@ Website modern untuk mengecek broken links seperti [brokenlinkcheck.com](https:/
 - ✅ **Detail Error**: Menampilkan status code dan error message
 - ✅ **Filter Links**: Filter berdasarkan internal/external
 - ✅ **Export Results**: Export hasil dalam format JSON atau CSV
-- ✅ **Caching**: Hasil pengecekan di-cache untuk performa lebih baik
+- ✅ **Real-time Results**: Hasil selalu update tanpa cache
 - ✅ **Modern UI**: Desain yang responsif dan user-friendly
 
 ## 🚀 Instalasi
@@ -35,6 +35,34 @@ npm run dev
 
 4. Buka browser dan akses: `http://localhost:3000`
 
+## 🌐 Deploy ke Production
+
+### Deploy ke Vercel (Recommended)
+
+1. **Push ke GitHub**:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin YOUR_GITHUB_REPO_URL
+   git push -u origin main
+   ```
+
+2. **Deploy ke Vercel**:
+   - Kunjungi [vercel.com](https://vercel.com)
+   - Login dengan GitHub account
+   - Klik "Import Project"
+   - Pilih repository yang baru dibuat
+   - Vercel akan otomatis detect dan deploy
+   - Setiap kali push ke GitHub, Vercel akan auto-deploy
+
+3. **Hasil**: Website akan live di URL seperti `https://your-app.vercel.app`
+
+### Deploy ke Railway/Render
+
+Alternatif lain yang juga bagus untuk Node.js apps dengan auto-deploy dari GitHub.
+
 ## 📋 Penggunaan
 
 1. Masukkan URL website yang ingin dicek (contoh: `www.example.com` atau `https://example.com`)
@@ -50,9 +78,9 @@ npm run dev
 - Mengecek multiple links secara bersamaan (default: 15 concurrent requests)
 - Menggunakan worker pattern untuk distribusi tugas
 
-### 2. **Caching System**
-- Hasil pengecekan di-cache selama 1 jam
-- Mengurangi beban server dan mempercepat response
+### 2. **Real-time Results**
+- Hasil selalu fresh dan up-to-date
+- Tidak ada cache, setiap check memberikan hasil terbaru
 
 ### 3. **Efficient Crawling**
 - Menggunakan queue untuk BFS traversal
@@ -75,7 +103,6 @@ Anda dapat mengubah konfigurasi di `server.js`:
 
 - `maxPages`: Default limit halaman yang di-scan (default: 100)
 - `concurrency`: Jumlah parallel requests (default: 15)
-- `cache TTL`: Waktu cache (default: 3600 detik / 1 jam)
 - `timeout`: Request timeout (default: 8-10 detik)
 
 ## 📦 Dependencies
@@ -83,7 +110,6 @@ Anda dapat mengubah konfigurasi di `server.js`:
 - **express**: Web framework
 - **axios**: HTTP client untuk fetching
 - **cheerio**: HTML parsing (jQuery-like)
-- **node-cache**: Caching system
 - **url-parse**: URL parsing dan normalization
 - **cors**: Cross-origin resource sharing
 
