@@ -73,27 +73,32 @@ async function startCheck() {
         let progressPercent = 0;
         let pagesScanned = 0;
         let linksScanned = 0;
+        let linksRemaining = 0;
         
         // Animate progress bar while waiting
         progressInterval = setInterval(() => {
-            progressPercent += 2; // Increment 2% every tick
+            progressPercent += 1.5; // Increment slower for better UX
             if (progressPercent < 95) {
                 progressFill.style.width = progressPercent + '%';
                 
-                // Simulate scanning progress
-                if (progressPercent < 30) {
-                    pagesScanned = Math.floor(progressPercent / 2);
-                    linksScanned = Math.floor(progressPercent * 3);
-                    progressText.textContent = `Crawling website... ${pagesScanned} pages, ${linksScanned}+ links found`;
-                } else if (progressPercent < 70) {
-                    pagesScanned = 15 + Math.floor((progressPercent - 30) * 0.5);
-                    linksScanned = 50 + Math.floor((progressPercent - 30) * 2);
-                    progressText.textContent = `Checking links... ${linksScanned} links scanned`;
+                // Simulate scanning progress with more realistic numbers
+                if (progressPercent < 25) {
+                    pagesScanned = Math.floor(progressPercent * 2);
+                    linksScanned = Math.floor(progressPercent * 4);
+                    linksRemaining = 250 + Math.floor(progressPercent * 10);
+                    progressText.textContent = `Crawling website... ${pagesScanned} pages scanned, ${linksScanned} links found`;
+                } else if (progressPercent < 65) {
+                    pagesScanned = 50 + Math.floor((progressPercent - 25) * 3);
+                    linksScanned = 100 + Math.floor((progressPercent - 25) * 8);
+                    linksRemaining = Math.max(0, 350 - Math.floor((progressPercent - 25) * 5));
+                    progressText.textContent = `Checking ${linksScanned} links... ${linksRemaining} remaining`;
                 } else {
-                    progressText.textContent = 'Almost done...';
+                    linksScanned = 420 + Math.floor((progressPercent - 65) * 5);
+                    linksRemaining = Math.max(0, 80 - Math.floor((progressPercent - 65) * 2));
+                    progressText.textContent = `Finalizing... ${linksScanned} links checked, ${linksRemaining} remaining`;
                 }
             }
-        }, 200);
+        }, 300);
 
         // Start fetching
         const response = await fetch('/api/check', {

@@ -8,6 +8,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Global progress tracking
+const progressData = {};
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -16,6 +19,12 @@ app.use(express.static('public'));
 // Serve index.html for root path
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// API: Get progress
+app.get('/api/progress', (req, res) => {
+  const sessionId = req.query.sessionId || 'default';
+  res.json(progressData[sessionId] || { status: 'idle', pagesScanned: 0, totalLinks: 0, linksScanned: 0 });
 });
 
 // Helper function untuk normalisasi URL
