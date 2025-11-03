@@ -168,8 +168,9 @@ async function checkLinkStatus(url, retries = 2) {
         headers
       });
 
-      // Jika HEAD tidak didukung, coba GET
-      if (response.status === 405 || response.status === 501) {
+      // Jika HEAD tidak didukung atau return 4xx error, coba GET
+      if (response.status === 405 || response.status === 501 || 
+          (response.status >= 400 && response.status < 500)) {
         const getResponse = await axios.get(url, {
           timeout: 8000,
           maxRedirects: 5,
