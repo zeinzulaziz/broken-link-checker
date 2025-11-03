@@ -153,8 +153,6 @@ async function startCheck() {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('.filter-btn[data-filter="all"]')?.classList.add('active');
 
-    let progressInterval = null;
-
     try {
         const totalMaxPages = document.getElementById('maxPagesToggle').checked 
             ? parseInt(document.getElementById('maxPages').value) 
@@ -187,8 +185,29 @@ async function startCheck() {
             const batchMaxPages = Math.min(BATCH_SIZE, totalMaxPages - (batchIndex * BATCH_SIZE));
             const batchNumber = batchIndex + 1;
             
-            progressText.textContent = `Processing batch ${batchNumber}/${batches} (up to ${batchMaxPages} pages)...`;
-            progressFill.style.width = `${(batchIndex / batches) * 95}%`;
+            const baseProgress = (batchIndex / batches) * 100;
+            const batchProgressWidth = 100 / batches;
+            
+            progressText.textContent = `Batch ${batchNumber}/${batches}: Initializing...`;
+            progressFill.style.width = `${baseProgress}%`;
+
+            // Setup animation for current batch
+            let batchProgress = 0;
+            const batchProgressInterval = setInterval(() => {
+                batchProgress += 0.5;
+                if (batchProgress < 95) {
+                    const currentProgress = baseProgress + (batchProgress * batchProgressWidth / 100);
+                    progressFill.style.width = `${currentProgress}%`;
+                    
+                    if (batchProgress < 30) {
+                        progressText.textContent = `Batch ${batchNumber}/${batches}: Crawling website... (${Math.floor(batchProgress * 2)} pages scanned)`;
+                    } else if (batchProgress < 70) {
+                        progressText.textContent = `Batch ${batchNumber}/${batches}: Checking links... (${Math.floor(batchProgress * 2)} links checked)`;
+                    } else {
+                        progressText.textContent = `Batch ${batchNumber}/${batches}: Finalizing... (${Math.floor(batchProgress * 2)} links verified)`;
+                    }
+                }
+            }, 200);
 
             try {
                 const response = await fetch('/api/check', {
@@ -203,6 +222,9 @@ async function startCheck() {
                         nextUrlsToVisit: nextUrlsToVisit
                     })
                 });
+                
+                // Clear batch progress animation
+                clearInterval(batchProgressInterval);
 
                 if (!response.ok) {
                     let errorMessage = 'Failed to check links';
@@ -213,6 +235,8 @@ async function startCheck() {
                         if (response.status === 504 || response.status === 408) {
                             errorMessage = `Batch ${batchNumber} timed out. Continuing with next batch...`;
                             console.warn(errorMessage);
+                            // Clear batch progress animation on timeout
+                            clearInterval(batchProgressInterval);
                             // Continue to next batch instead of failing completely
                             continue;
                         } else {
@@ -220,10 +244,12 @@ async function startCheck() {
                         }
                     }
                     if (response.status !== 504 && response.status !== 408) {
+                        clearInterval(batchProgressInterval);
                         throw new Error(errorMessage);
                     }
                     // For timeout errors, log and continue
                     console.warn(`Batch ${batchNumber} failed: ${errorMessage}`);
+                    clearInterval(batchProgressInterval);
                     continue;
                 }
 
@@ -287,6 +313,9 @@ async function startCheck() {
                 }
                 
             } catch (error) {
+                // Clear batch progress animation on error
+                clearInterval(batchProgressInterval);
+                
                 console.error(`Error in batch ${batchNumber}:`, error);
                 // Continue with next batch even if one fails
                 if (error.message && !error.message.includes('timeout')) {
@@ -295,7 +324,6 @@ async function startCheck() {
             }
         }
         
-        clearInterval(progressInterval);
         progressFill.style.width = '100%';
         progressText.textContent = `Complete! Scanned ${allResults.totalPages} pages, found ${allResults.brokenLinks} broken links`;
         
@@ -314,7 +342,6 @@ async function startCheck() {
         showError(error.message || 'An error occurred while checking links');
         progressBar.style.display = 'none';
     } finally {
-        if (progressInterval) clearInterval(progressInterval);
         checkBtn.disabled = false;
         btnText.textContent = 'Find Broken Links';
         btnLoader.style.display = 'none';
