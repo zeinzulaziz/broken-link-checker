@@ -81,8 +81,13 @@ async function crawlWebsite(startUrl, maxPages = 500, existingVisited = [], exis
   
   const baseUrl = new Url(startUrl);
   const baseDomain = baseUrl.hostname;
+  
+  // maxPages should be the number of NEW pages to crawl in this batch
+  // So we need to track how many NEW pages we've crawled
+  const initialVisitedCount = visited.size;
+  const targetNewPages = maxPages;
 
-  while (toVisit.length > 0 && visited.size < maxPages) {
+  while (toVisit.length > 0 && (visited.size - initialVisitedCount) < targetNewPages) {
     const currentUrl = toVisit.shift();
     
     if (visited.has(currentUrl)) continue;
@@ -282,6 +287,8 @@ app.post('/api/check', async (req, res) => {
     // Analyze results
     const brokenLinks = [];
     const workingLinks = [];
+    const uniqueBrokenLinks = new Set(); // Track unique broken link URLs
+    const uniqueWorkingLinks = new Set(); // Track unique working link URLs
     
     // Group by unique link
     allLinks.forEach(link => {
@@ -290,6 +297,13 @@ app.post('/api/check', async (req, res) => {
       
       const isBroken = status.status >= 400 || status.status === 0;
       const isInternal = isInternalUrl(link, baseDomain);
+      
+      // Track unique broken/working links
+      if (isBroken) {
+        uniqueBrokenLinks.add(link);
+      } else {
+        uniqueWorkingLinks.add(link);
+      }
       
       // Get all occurrences of this link
       const occurrences = linkMetadata.get(link) || [];
@@ -347,8 +361,8 @@ app.post('/api/check', async (req, res) => {
       baseDomain,
       totalPages: pageData.size,
       totalLinks: allLinks.size,
-      brokenLinks: brokenLinks.length,
-      workingLinks: workingLinks.length,
+      brokenLinks: uniqueBrokenLinks.size, // Count unique broken link URLs, not occurrences
+      workingLinks: uniqueWorkingLinks.size, // Count unique working link URLs, not occurrences
       brokenLinksDetails: brokenLinks,
       workingLinksDetails: workingLinks,
       // Include state for batch continuation
