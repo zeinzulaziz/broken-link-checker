@@ -3,6 +3,7 @@ const cors = require('cors');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const Url = require('url-parse');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+
+// Serve index.html for root path
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Helper function untuk normalisasi URL
 function normalizeUrl(url, baseUrl) {
