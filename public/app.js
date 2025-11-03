@@ -181,6 +181,7 @@ function displayResults(data) {
                         <th>Link Text</th>
                         <th>Page Where Found</th>
                         <th style="width: 150px;">Server Response</th>
+                        <th style="width: 80px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -219,6 +220,11 @@ function displayResults(data) {
                         ${link.error || link.statusText || link.status || 'N/A'}
                     </span>
                 </td>
+                <td>
+                    <button class="btn-hide" data-url="${link.url}" title="Hide this row">
+                        🗑️
+                    </button>
+                </td>
             </tr>
         `;
     });
@@ -234,13 +240,24 @@ function displayResults(data) {
     // Add click handlers for row selection
     document.querySelectorAll('.result-row').forEach(row => {
         row.addEventListener('click', (e) => {
-            // Don't trigger selection if clicking on links
-            if (e.target.tagName === 'A' || e.target.tagName === 'SPAN') return;
+            // Don't trigger selection if clicking on links or buttons
+            if (e.target.tagName === 'A' || e.target.tagName === 'SPAN' || e.target.tagName === 'BUTTON') return;
             
             // Remove selection from other rows
             document.querySelectorAll('.result-row').forEach(r => r.classList.remove('selected'));
             // Add selection to clicked row
             row.classList.add('selected');
+        });
+    });
+    
+    // Add click handlers for hide buttons
+    document.querySelectorAll('.btn-hide').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent row selection
+            const row = btn.closest('tr');
+            if (row) {
+                row.style.display = 'none';
+            }
         });
     });
     
