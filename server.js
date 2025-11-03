@@ -21,6 +21,14 @@ app.get('/', (req, res) => {
 // Helper function untuk normalisasi URL
 function normalizeUrl(url, baseUrl) {
   try {
+    // Skip non-HTTP protocols (mailto:, tel:, javascript:, etc.)
+    if (url.toLowerCase().startsWith('mailto:') || 
+        url.toLowerCase().startsWith('tel:') ||
+        url.toLowerCase().startsWith('javascript:') ||
+        url.toLowerCase().startsWith('data:')) {
+      return null;
+    }
+    
     const parsed = new Url(url);
     if (parsed.hostname) {
       let href = parsed.href.split('#')[0]; // Remove fragment
