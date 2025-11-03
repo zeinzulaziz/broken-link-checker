@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Link Checker - Free Online Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 Broken Link Checker</h1>
+            <p class="subtitle">Find and fix broken links on your website instantly</p>
+        </header>
+
+        <main>
+            <div class="check-form">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="urlInput" 
+                        placeholder="Enter your website URL (e.g., www.example.com)"
+                        autocomplete="off"
+                    >
+                    <button id="checkBtn" class="btn-primary">
+                        <span id="btnText">Find Broken Links</span>
+                        <span id="btnLoader" class="loader" style="display: none;"></span>
+                    </button>
+                </div>
+                <div class="options">
+                    <label>
+                        <input type="checkbox" id="maxPagesToggle"> 
+                        Limit pages
+                        <input type="number" id="maxPages" value="100" min="1" max="1000" style="width: 80px; margin-left: 10px;">
+                    </label>
+                </div>
+            </div>
+
+            <div id="progressBar" class="progress-bar" style="display: none;">
+                <div id="progressFill" class="progress-fill"></div>
+                <span id="progressText" class="progress-text">Initializing...</span>
+            </div>
+
+            <div id="results" class="results" style="display: none;">
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="card-icon">📄</div>
+                        <div class="card-info">
+                            <div class="card-value" id="totalPages">0</div>
+                            <div class="card-label">Pages Scanned</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🔗</div>
+                        <div class="card-info">
+                            <div class="card-value" id="totalLinks">0</div>
+                            <div class="card-label">Total Links</div>
+                        </div>
+                    </div>
+                    <div class="summary-card broken">
+                        <div class="card-icon">⚠️</div>
+                        <div class="card-info">
+                            <div class="card-value" id="brokenCount">0</div>
+                            <div class="card-label">Broken Links</div>
+                        </div>
+                    </div>
+                    <div class="summary-card success">
+                        <div class="card-icon">✅</div>
+                        <div class="card-info">
+                            <div class="card-value" id="workingCount">0</div>
+                            <div class="card-label">Working Links</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-header">
+                    <h2>Broken Links Found</h2>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="internal">Internal</button>
+                        <button class="filter-btn" data-filter="external">External</button>
+                    </div>
+                </div>
+
+                <div id="brokenLinksList" class="links-list"></div>
+
+                <div id="statusMessage" class="status-message" style="display: none;">
+                    <div class="status-content">
+                        <h3 class="status-title">Status</h3>
+                        <p class="status-completed">COMPLETED!</p>
+                        <p class="status-summary"></p>
+                    </div>
+                </div>
+
+                <div class="export-section">
+                    <button id="exportBtn" class="btn-secondary">Export as JSON</button>
+                    <button id="exportCSVBtn" class="btn-secondary">Export as CSV</button>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </main>
+
+        <footer>
+            <p>Free online tool to check broken links on your website</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
