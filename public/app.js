@@ -161,7 +161,7 @@ function displayResults(data) {
     if (filteredLinks.length === 0) {
         brokenLinksList.innerHTML = '<div class="link-item" style="border-left-color: var(--success-color); text-align: center; padding: 40px;"><p style="font-size: 1.2rem; color: var(--text-secondary);">🎉 No broken links found!</p></div>';
         const statusSummary = document.querySelector('.status-summary');
-        statusSummary.textContent = `Processed ${data.totalPages} web page${data.totalPages !== 1 ? 's' : ''}, found 0 broken links`;
+        statusSummary.textContent = `Processed ${data.totalPages} web-page${data.totalPages !== 1 ? 's' : ''} and ${data.totalLinks} link${data.totalLinks !== 1 ? 's' : ''}`;
         statusMessage.style.display = 'block';
         return;
     }
@@ -228,7 +228,7 @@ function displayResults(data) {
     
     // Update status message
     const statusSummary = document.querySelector('.status-summary');
-    statusSummary.textContent = `Processed ${data.totalPages} web page${data.totalPages !== 1 ? 's' : ''}, found ${data.brokenLinks} broken link${data.brokenLinks !== 1 ? 's' : ''}`;
+    statusSummary.textContent = `Processed ${data.totalPages} web-page${data.totalPages !== 1 ? 's' : ''} and ${data.totalLinks} link${data.totalLinks !== 1 ? 's' : ''}`;
     statusMessage.style.display = 'block';
 }
 
