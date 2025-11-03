@@ -181,10 +181,19 @@ async function startCheck() {
         let visitedUrls = [];
         let nextUrlsToVisit = [];
         let hasMoreBatches = true;
+        let totalPagesScanned = 0; // Track total pages scanned across all batches
 
         // Process each batch
         for (let batchIndex = 0; batchIndex < batches && hasMoreBatches; batchIndex++) {
-            const batchMaxPages = Math.min(BATCH_SIZE, totalMaxPages - (batchIndex * BATCH_SIZE));
+            // Calculate remaining pages to scan
+            const remainingPages = totalMaxPages - totalPagesScanned;
+            const batchMaxPages = Math.min(BATCH_SIZE, remainingPages);
+            
+            // Stop if no more pages to scan
+            if (batchMaxPages <= 0) {
+                break;
+            }
+            
             const batchNumber = batchIndex + 1;
             
             const baseProgress = (batchIndex / batches) * 100;
@@ -267,7 +276,15 @@ async function startCheck() {
                 hasMoreBatches = batchData.hasMore !== false && nextUrlsToVisit.length > 0;
                 
                 // Merge batch results
-                allResults.totalPages += batchData.totalPages || 0;
+                const batchPages = batchData.totalPages || 0;
+                allResults.totalPages += batchPages;
+                totalPagesScanned += batchPages; // Track total pages scanned
+                
+                // Stop if we've reached the limit
+                if (totalPagesScanned >= totalMaxPages) {
+                    hasMoreBatches = false;
+                    break;
+                }
                 
                 // Collect all unique link URLs from this batch
                 const batchLinks = new Set();
