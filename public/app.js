@@ -38,6 +38,14 @@ statusFilter.addEventListener('change', () => {
     displayResults(currentResults);
 });
 
+// Show all hidden rows button
+const showAllBtn = document.getElementById('showAllBtn');
+showAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('.result-row').forEach(row => {
+        row.style.display = '';
+    });
+});
+
 async function startCheck() {
     const url = urlInput.value.trim();
     if (!url) {
