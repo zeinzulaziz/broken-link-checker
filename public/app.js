@@ -54,6 +54,32 @@ async function startCheck() {
             ? parseInt(document.getElementById('maxPages').value) 
             : 100;
 
+        // Show loading stages with animated progress
+        let progressPercent = 0;
+        let pagesScanned = 0;
+        let linksScanned = 0;
+        
+        // Animate progress bar while waiting
+        progressInterval = setInterval(() => {
+            progressPercent += 2; // Increment 2% every tick
+            if (progressPercent < 95) {
+                progressFill.style.width = progressPercent + '%';
+                
+                // Simulate scanning progress
+                if (progressPercent < 30) {
+                    pagesScanned = Math.floor(progressPercent / 2);
+                    linksScanned = Math.floor(progressPercent * 3);
+                    progressText.textContent = `Crawling website... ${pagesScanned} pages, ${linksScanned}+ links found`;
+                } else if (progressPercent < 70) {
+                    pagesScanned = 15 + Math.floor((progressPercent - 30) * 0.5);
+                    linksScanned = 50 + Math.floor((progressPercent - 30) * 2);
+                    progressText.textContent = `Checking links... ${linksScanned} links scanned`;
+                } else {
+                    progressText.textContent = 'Almost done...';
+                }
+            }
+        }, 200);
+
         // Start fetching
         const response = await fetch('/api/check', {
             method: 'POST',
@@ -67,20 +93,6 @@ async function startCheck() {
             const error = await response.json();
             throw new Error(error.error || 'Failed to check links');
         }
-
-        // Show loading stages
-        progressFill.style.width = '30%';
-        progressText.textContent = 'Crawling and analyzing website...';
-        
-        // Animate progress bar while waiting
-        progressInterval = setInterval(() => {
-            const currentWidth = parseInt(progressFill.style.width);
-            if (currentWidth < 90) {
-                progressFill.style.width = (currentWidth + 5) + '%';
-                const pagesText = currentWidth < 50 ? 'Crawling website...' : 'Checking links...';
-                progressText.textContent = pagesText;
-            }
-        }, 300);
 
         const data = await response.json();
         
