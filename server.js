@@ -72,7 +72,7 @@ function isInternalUrl(url, baseDomain) {
 }
 
 // Crawl website dan ekstrak semua links
-async function crawlWebsite(startUrl, maxPages = 500, existingVisited = [], existingToVisit = []) {
+async function crawlWebsite(startUrl, maxPages = 2000, existingVisited = [], existingToVisit = []) {
   const visited = new Set(existingVisited);
   const toVisit = existingToVisit.length > 0 ? [...existingToVisit] : [startUrl];
   const links = new Map(); // Map<url, Set<link>>

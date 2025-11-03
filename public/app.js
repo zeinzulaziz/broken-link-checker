@@ -156,7 +156,7 @@ async function startCheck() {
     try {
         const totalMaxPages = document.getElementById('maxPagesToggle').checked 
             ? parseInt(document.getElementById('maxPages').value) 
-            : 500;
+            : 2000; // Default increased to handle large websites
         
         // Batch processing: split into smaller chunks to avoid timeout
         const BATCH_SIZE = 100; // Pages per batch
