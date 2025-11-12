@@ -129,6 +129,47 @@ showAllBtn.addEventListener('click', () => {
     });
 });
 
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+async function copyToClipboard(text) {
+    if (navigator?.clipboard?.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            console.warn('Clipboard API failed, falling back to execCommand.', err);
+        }
+    }
+
+    // Fallback for older browsers
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    let success = false;
+    try {
+        success = document.execCommand('copy');
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+    }
+
+    document.body.removeChild(textarea);
+    return success;
+}
+
 async function startCheck() {
     const url = urlInput.value.trim();
     if (!url) {
@@ -467,13 +508,26 @@ function displayResults(data) {
             }
         }
         
+        const escapedLinkText = escapeHtml(linkText);
+        const encodedLinkText = encodeURIComponent(linkText);
+
         tableHTML += `
             <tr class="result-row">
                 <td>${index + 1}</td>
                 <td class="broken-link">
                     <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a>
                 </td>
-                <td class="link-text">${linkText}</td>
+                <td class="link-text">
+                    <span class="text-value">${escapedLinkText}</span>
+                    <button 
+                        class="btn-copy-text" 
+                        data-clipboard="${encodedLinkText}" 
+                        type="button" 
+                        title="Copy link text"
+                    >
+                        📋
+                    </button>
+                </td>
                 <td class="page-found">
                     <a href="${link.page}" target="_blank" rel="noopener noreferrer">view page</a>
                 </td>
@@ -520,6 +574,23 @@ function displayResults(data) {
             if (row) {
                 row.style.display = 'none';
             }
+        });
+    });
+
+    // Add click handlers for copy buttons
+    document.querySelectorAll('.btn-copy-text').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const text = decodeURIComponent(btn.dataset.clipboard || '');
+            if (!text) return;
+
+            const originalContent = btn.textContent;
+            const success = await copyToClipboard(text);
+
+            btn.textContent = success ? '✅' : '⚠️';
+            setTimeout(() => {
+                btn.textContent = originalContent;
+            }, 1500);
         });
     });
     
