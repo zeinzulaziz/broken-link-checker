@@ -19,8 +19,13 @@ const urlSuggestions = document.getElementById('urlSuggestions');
 
 // URL History Functions
 function getUrlHistory() {
-    const history = localStorage.getItem('urlHistory');
-    return history ? JSON.parse(history) : [];
+    try {
+        const history = JSON.parse(localStorage.getItem('urlHistory') || '[]');
+        return Array.isArray(history) ? history : [];
+    } catch (err) {
+        console.warn('URL history unreadable, starting fresh.', err);
+        return [];
+    }
 }
 
 function saveUrlToHistory(url) {
@@ -58,10 +63,10 @@ function showSuggestions(query = '') {
     }
 
     urlSuggestions.innerHTML = filtered.map(url => `
-        <div class="suggestion-item">
-            <span class="icon">🔗</span>
-            <span class="url">${url}</span>
-            <span class="delete-btn" data-url="${url}">🗑️</span>
+        <div class="suggestion-item" role="option">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+            <span class="url">${escapeHtml(url)}</span>
+            <button class="delete-btn" data-url="${escapeHtml(url)}" type="button" aria-label="Remove from history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
         </div>
     `).join('');
 
@@ -69,7 +74,7 @@ function showSuggestions(query = '') {
     document.querySelectorAll('.suggestion-item').forEach(item => {
         const url = item.querySelector('.url').textContent;
         item.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
+            if (e.target.closest('.delete-btn')) {
                 deleteUrlFromHistory(url);
                 e.stopPropagation();
             } else {
@@ -84,18 +89,26 @@ function showSuggestions(query = '') {
 }
 
 // Event listeners
-checkBtn.addEventListener('click', startCheck);
+const checkForm = document.getElementById('checkForm');
+checkForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    urlSuggestions.classList.remove('show');
+    startCheck();
+});
+
+// Limit-pages toggle enables/disables the page cap input
+const maxPagesToggle = document.getElementById('maxPagesToggle');
+const maxPagesInput = document.getElementById('maxPages');
+maxPagesToggle.addEventListener('change', () => {
+    maxPagesInput.disabled = !maxPagesToggle.checked;
+    if (maxPagesToggle.checked) maxPagesInput.focus();
+});
+
 urlInput.addEventListener('input', (e) => {
     showSuggestions(e.target.value);
 });
 urlInput.addEventListener('focus', (e) => {
     showSuggestions(e.target.value);
-});
-urlInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        urlSuggestions.classList.remove('show');
-        startCheck();
-    }
 });
 
 // Hide suggestions when clicking outside
@@ -104,6 +117,11 @@ document.addEventListener('click', (e) => {
         urlSuggestions.classList.remove('show');
     }
 });
+
+function setProgress(pct) {
+    progressFill.style.width = `${pct}%`;
+    progressBar.setAttribute('aria-valuenow', String(Math.round(pct)));
+}
 
 // Filter buttons
 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -184,7 +202,7 @@ async function startCheck() {
     btnText.textContent = 'Checking...';
     btnLoader.style.display = 'inline-block';
     progressBar.style.display = 'block';
-    progressFill.style.width = '0%';
+    setProgress(0);
     progressText.textContent = 'Initializing...';
     
     // Reset filters
@@ -241,7 +259,7 @@ async function startCheck() {
             const batchProgressWidth = 100 / batches;
             
             progressText.textContent = `Batch ${batchNumber}/${batches}: Initializing...`;
-            progressFill.style.width = `${baseProgress}%`;
+            setProgress(baseProgress);
 
             // Setup animation for current batch
             let batchProgress = 0;
@@ -249,7 +267,7 @@ async function startCheck() {
                 batchProgress += 0.5;
                 if (batchProgress < 95) {
                     const currentProgress = baseProgress + (batchProgress * batchProgressWidth / 100);
-                    progressFill.style.width = `${currentProgress}%`;
+                    setProgress(currentProgress);
                     
                     if (batchProgress < 30) {
                         progressText.textContent = `Batch ${batchNumber}/${batches}: Crawling website... (${Math.floor(batchProgress * 2)} pages scanned)`;
@@ -391,7 +409,7 @@ async function startCheck() {
                 }
 
                 // Update progress
-                progressFill.style.width = `${((batchIndex + 1) / batches) * 95}%`;
+                setProgress(((batchIndex + 1) / batches) * 95);
                 const remainingBatches = hasMoreBatches ? ` (${nextUrlsToVisit.length} pages remaining)` : '';
                 progressText.textContent = `Batch ${batchNumber}/${batches} complete. Found ${allResults.brokenLinks} broken links so far${remainingBatches}...`;
                 
@@ -418,7 +436,7 @@ async function startCheck() {
             }
         }
         
-        progressFill.style.width = '100%';
+        setProgress(100);
         progressText.textContent = `Complete! Scanned ${allResults.totalPages} pages, found ${allResults.brokenLinks} broken links`;
         
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -437,7 +455,7 @@ async function startCheck() {
         progressBar.style.display = 'none';
     } finally {
         checkBtn.disabled = false;
-        btnText.textContent = 'Find Broken Links';
+        btnText.textContent = 'Check links';
         btnLoader.style.display = 'none';
     }
 }
@@ -448,6 +466,20 @@ function displayResults(data) {
     document.getElementById('totalLinks').textContent = data.totalLinks || 0;
     document.getElementById('brokenCount').textContent = data.brokenLinks || 0;
     document.getElementById('workingCount').textContent = data.workingLinks || 0;
+
+    // Link-health strip: share of checked links that are working vs broken
+    const totalForStrip = (data.brokenLinks || 0) + (data.workingLinks || 0);
+    const brokenPct = totalForStrip > 0 ? Math.min(100, (data.brokenLinks / totalForStrip) * 100) : 0;
+    const healthBroken = document.getElementById('healthBroken');
+    const healthWorking = document.getElementById('healthWorking');
+    const healthCaption = document.getElementById('healthCaption');
+    if (healthBroken && healthWorking && healthCaption) {
+        healthBroken.style.width = `${brokenPct}%`;
+        healthWorking.style.width = `${100 - brokenPct}%`;
+        healthCaption.textContent = totalForStrip > 0
+            ? `${Math.round(100 - brokenPct)}% of ${totalForStrip} link${totalForStrip !== 1 ? 's' : ''} healthy`
+            : 'No links checked';
+    }
 
     // Filter broken links
     let filteredLinks = data.brokenLinksDetails || [];
@@ -467,7 +499,7 @@ function displayResults(data) {
 
     // Display broken links
     if (filteredLinks.length === 0) {
-        brokenLinksList.innerHTML = '<div class="link-item" style="border-left-color: var(--success-color); text-align: center; padding: 40px;"><p style="font-size: 1.2rem; color: var(--text-secondary);">🎉 No broken links found!</p></div>';
+        brokenLinksList.innerHTML = '<div class="link-item empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><p>No broken links found on this site.</p></div>';
         const statusSummary = document.querySelector('.status-summary');
         statusSummary.textContent = `Processed ${data.totalPages} web-page${data.totalPages !== 1 ? 's' : ''} and ${data.totalLinks} link${data.totalLinks !== 1 ? 's' : ''}`;
         statusMessage.style.display = 'block';
@@ -508,37 +540,47 @@ function displayResults(data) {
             }
         }
         
+        const shortStatus = link.status > 0
+            ? `${link.status} ${link.statusText || ''}`.trim()
+            : (link.statusText || 'Connection failed');
+        const fullStatus = link.error ? String(link.error) : shortStatus;
+
         const escapedLinkText = escapeHtml(linkText);
         const encodedLinkText = encodeURIComponent(linkText);
+        const escapedUrl = escapeHtml(link.url);
+        const escapedPage = escapeHtml(link.page || '');
+        const escapedUrlAttr = escapedUrl.replace(/"/g, '&quot;');
+        const escapedPageAttr = escapedPage.replace(/"/g, '&quot;');
 
         tableHTML += `
             <tr class="result-row">
                 <td>${index + 1}</td>
                 <td class="broken-link">
-                    <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a>
+                    <a href="${escapedUrlAttr}" target="_blank" rel="noopener noreferrer">${escapedUrl}</a>
                 </td>
                 <td class="link-text">
                     <span class="text-value">${escapedLinkText}</span>
-                    <button 
-                        class="btn-copy-text" 
-                        data-clipboard="${encodedLinkText}" 
-                        type="button" 
+                    <button
+                        class="btn-copy-text btn-icon"
+                        data-clipboard="${encodedLinkText}"
+                        type="button"
                         title="Copy link text"
+                        aria-label="Copy link text"
                     >
-                        📋
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     </button>
                 </td>
                 <td class="page-found">
-                    <a href="${link.page}" target="_blank" rel="noopener noreferrer">view page</a>
+                    <a href="${escapedPageAttr}" target="_blank" rel="noopener noreferrer">view page</a>
                 </td>
                 <td>
-                    <span class="status-badge ${link.status === 404 ? 'status-404' : ''}">
-                        ${link.error || link.statusText || link.status || 'N/A'}
+                    <span class="status-badge ${link.status === 404 ? 'status-404' : ''}" title="${escapeHtml(fullStatus)}">
+                        ${escapeHtml(shortStatus)}
                     </span>
                 </td>
                 <td>
-                    <button class="btn-hide" data-url="${link.url}" title="Hide this row">
-                        🗑️
+                    <button class="btn-hide" data-url="${escapedUrlAttr}" type="button" title="Hide this row" aria-label="Hide this row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                     </button>
                 </td>
             </tr>
@@ -556,8 +598,8 @@ function displayResults(data) {
     // Add click handlers for row selection
     document.querySelectorAll('.result-row').forEach(row => {
         row.addEventListener('click', (e) => {
-            // Don't trigger selection if clicking on links or buttons
-            if (e.target.tagName === 'A' || e.target.tagName === 'SPAN' || e.target.tagName === 'BUTTON') return;
+            // Don't trigger selection when clicking anything interactive
+            if (e.target.closest('a, button, select, input')) return;
             
             // Remove selection from other rows
             document.querySelectorAll('.result-row').forEach(r => r.classList.remove('selected'));
@@ -584,12 +626,16 @@ function displayResults(data) {
             const text = decodeURIComponent(btn.dataset.clipboard || '');
             if (!text) return;
 
-            const originalContent = btn.textContent;
+            const originalContent = btn.innerHTML;
             const success = await copyToClipboard(text);
 
-            btn.textContent = success ? '✅' : '⚠️';
+            btn.innerHTML = success
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 10"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+            btn.style.color = success ? 'var(--ok)' : 'var(--bad)';
             setTimeout(() => {
-                btn.textContent = originalContent;
+                btn.innerHTML = originalContent;
+                btn.style.color = '';
             }, 1500);
         });
     });

@@ -3,121 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Link Checker - Free Online Tool</title>
+    <meta name="description" content="Crawl your website and get a list of dead links — internal and external — with status codes and a JSON or CSV export you can hand off. Free, no signup.">
+    <title>Broken Link Checker — Find Dead Links on Your Site</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E5A33D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3Cline x1='4' y1='20' x2='20' y2='4'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🔗 Broken Link Checker</h1>
-            <p class="subtitle">Find and fix broken links on your website instantly</p>
-        </header>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="/" aria-label="Broken Link Checker — home">
+                <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    <line x1="4" y1="20" x2="20" y2="4"/>
+                </svg>
+                <span class="brand-name">Broken Link Checker</span>
+            </a>
+            <p class="topbar-note">Free · No signup</p>
+        </div>
+    </header>
 
-        <main>
-            <div class="check-form">
+    <main class="container">
+        <section class="intro">
+            <h1>Every dead link on your site, in one list</h1>
+            <p class="subtitle">Paste a URL — the checker crawls your internal pages, verifies every link it finds, and hands you the list: status codes, the page where each link was found, JSON/CSV export.</p>
+        </section>
+
+        <section class="check-form" aria-label="Start a scan">
+            <form id="checkForm" novalidate>
                 <div class="input-group">
                     <div class="url-input-wrapper">
-                        <input 
-                            type="text" 
-                            id="urlInput" 
-                            placeholder="Enter your website URL (e.g., www.example.com)"
+                        <label class="visually-hidden" for="urlInput">Website URL</label>
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        <input
+                            type="text"
+                            id="urlInput"
+                            name="url"
+                            inputmode="url"
+                            placeholder="www.example.com"
                             autocomplete="off"
+                            spellcheck="false"
+                            required
                         >
-                        <div id="urlSuggestions" class="url-suggestions"></div>
+                        <div id="urlSuggestions" class="url-suggestions" role="listbox" aria-label="Recent URLs"></div>
                     </div>
-                    <button id="checkBtn" class="btn-primary">
-                        <span id="btnText">Find Broken Links</span>
-                        <span id="btnLoader" class="loader" style="display: none;"></span>
+                    <button type="submit" id="checkBtn" class="btn-primary">
+                        <span id="btnText">Check links</span>
+                        <span id="btnLoader" class="loader" style="display: none;" aria-hidden="true"></span>
                     </button>
                 </div>
                 <div class="options">
-                    <label>
-                        <input type="checkbox" id="maxPagesToggle"> 
-                        Limit pages
-                        <input type="number" id="maxPages" value="100" min="1" max="10000" style="width: 80px; margin-left: 10px;">
+                    <label class="toggle-label" for="maxPagesToggle">
+                        <input type="checkbox" id="maxPagesToggle">
+                        <span>Limit pages</span>
                     </label>
+                    <input type="number" id="maxPages" class="max-pages-input" value="100" min="1" max="10000" aria-label="Maximum pages to scan" disabled>
+                    <span class="options-hint">Off by default — a full scan follows every internal page.</span>
                 </div>
-            </div>
+            </form>
+        </section>
 
-            <div id="progressBar" class="progress-bar" style="display: none;">
+        <div id="progressBar" class="progress-bar" role="progressbar" aria-label="Scan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="display: none;">
+            <div class="progress-track">
                 <div id="progressFill" class="progress-fill"></div>
-                <span id="progressText" class="progress-text">Initializing...</span>
             </div>
+            <span id="progressText" class="progress-text">Initializing…</span>
+        </div>
 
-            <div id="results" class="results" style="display: none;">
-                <div class="summary-cards">
-                    <div class="summary-card">
-                        <div class="card-icon">📄</div>
-                        <div class="card-info">
-                            <div class="card-value" id="totalPages">0</div>
-                            <div class="card-label">Pages Scanned</div>
-                        </div>
+        <div id="results" class="results" style="display: none;">
+            <div class="summary-panel" aria-label="Scan summary">
+                <div class="summary-grid">
+                    <div class="stat">
+                        <div class="card-value" id="totalPages">0</div>
+                        <div class="card-label">Pages scanned</div>
                     </div>
-                    <div class="summary-card">
-                        <div class="card-icon">🔗</div>
-                        <div class="card-info">
-                            <div class="card-value" id="totalLinks">0</div>
-                            <div class="card-label">Total Links</div>
-                        </div>
+                    <div class="stat">
+                        <div class="card-value" id="totalLinks">0</div>
+                        <div class="card-label">Unique links</div>
                     </div>
-                    <div class="summary-card broken">
-                        <div class="card-icon">⚠️</div>
-                        <div class="card-info">
-                            <div class="card-value" id="brokenCount">0</div>
-                            <div class="card-label">Broken Links</div>
-                        </div>
+                    <div class="stat stat-broken">
+                        <div class="card-value" id="brokenCount">0</div>
+                        <div class="card-label">Broken</div>
                     </div>
-                    <div class="summary-card success">
-                        <div class="card-icon">✅</div>
-                        <div class="card-info">
-                            <div class="card-value" id="workingCount">0</div>
-                            <div class="card-label">Working Links</div>
-                        </div>
+                    <div class="stat stat-working">
+                        <div class="card-value" id="workingCount">0</div>
+                        <div class="card-label">Working</div>
                     </div>
                 </div>
+                <div class="health-strip" aria-hidden="true">
+                    <div id="healthWorking" class="health-segment health-working" style="width: 100%"></div>
+                    <div id="healthBroken" class="health-segment health-broken" style="width: 0%"></div>
+                </div>
+                <div class="health-legend">
+                    <span class="health-key"><i class="dot dot-working"></i>Working</span>
+                    <span class="health-key"><i class="dot dot-broken"></i>Broken</span>
+                    <span class="health-key health-key-muted" id="healthCaption"></span>
+                </div>
+            </div>
 
-                <div class="results-header">
-                    <h2>Broken Links Found</h2>
-                    <div class="filter-group">
+            <div class="results-header">
+                <h2>Broken links</h2>
+                <div class="filter-group">
+                    <div class="segmented" role="group" aria-label="Filter by link type">
                         <button class="filter-btn active" data-filter="all">All</button>
                         <button class="filter-btn" data-filter="internal">Internal</button>
                         <button class="filter-btn" data-filter="external">External</button>
-                        <select id="statusFilter" class="status-filter">
-                            <option value="all">All Status</option>
-                            <option value="404">404 Not Found</option>
-                            <option value="403">403 Forbidden</option>
-                            <option value="500">500 Server Error</option>
-                            <option value="0">Connection Failed</option>
-                        </select>
-                        <button id="showAllBtn" class="btn-show-all">Show All Hidden</button>
                     </div>
-                </div>
-
-                <div id="brokenLinksList" class="links-list"></div>
-
-                <div id="statusMessage" class="status-message" style="display: none;">
-                    <div class="status-content">
-                        <h3 class="status-title">Status</h3>
-                        <div class="status-divider"></div>
-                        <p class="status-summary"></p>
-                    </div>
-                </div>
-
-                <div class="export-section">
-                    <button id="exportBtn" class="btn-secondary">Export as JSON</button>
-                    <button id="exportCSVBtn" class="btn-secondary">Export as CSV</button>
+                    <select id="statusFilter" class="status-filter" aria-label="Filter by status code">
+                        <option value="all">All statuses</option>
+                        <option value="404">404 Not Found</option>
+                        <option value="403">403 Forbidden</option>
+                        <option value="500">500 Server Error</option>
+                        <option value="0">Connection failed</option>
+                    </select>
+                    <button id="showAllBtn" class="btn-ghost">Unhide all</button>
                 </div>
             </div>
 
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
-        </main>
+            <div id="brokenLinksList" class="links-list"></div>
 
-        <footer>
-            <p>Free online tool to check broken links on your website</p>
-        </footer>
-    </div>
+            <p id="statusMessage" class="status-message" style="display: none;">
+                <span class="status-summary"></span>
+            </p>
+
+            <div class="export-section">
+                <button id="exportBtn" class="btn-secondary">Export JSON</button>
+                <button id="exportCSVBtn" class="btn-secondary">Export CSV</button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" role="alert" style="display: none;"></div>
+
+        <section class="how-it-works" aria-labelledby="howTitle">
+            <h2 id="howTitle">How it works</h2>
+            <ol class="steps">
+                <li class="step">
+                    <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="9" y1="13" x2="15" y2="13"/>
+                        <line x1="9" y1="17" x2="15" y2="17"/>
+                    </svg>
+                    <h3>Crawls your pages</h3>
+                    <p>Starts at the URL you enter and follows internal links to map the site.</p>
+                </li>
+                <li class="step">
+                    <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="22 12 16 12 14 15 10 9 8 12 2 12"/>
+                    </svg>
+                    <h3>Checks every link</h3>
+                    <p>Internal and external links are checked in parallel, with the HTTP status recorded for each.</p>
+                </li>
+                <li class="step">
+                    <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <h3>Exports the list</h3>
+                    <p>Download results as JSON or CSV — everything broken, ready to hand off for fixing.</p>
+                </li>
+            </ol>
+            <p class="limits-note">HTML-only crawl: links injected by JavaScript can be missed · Results aren't stored after the scan · Very large sites run in batches and may take a while</p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p class="footer-brand">Broken Link Checker</p>
+            <p class="footer-note">Free · No signup · Results aren't stored</p>
+            <p class="footer-note">Exports JSON &amp; CSV</p>
+        </div>
+    </footer>
 
     <script src="app.js"></script>
 </body>
 </html>
-

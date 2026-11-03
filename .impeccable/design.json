@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T00:00:00.000Z",
+  "title": "Design System: Broken Link Checker",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Cool Ink",
+        "canonical": "#0f141a",
+        "tonalRamp": ["#090b0e", "#222529", "#3e4248", "#5c6269", "#7d838a", "#a0a6ac", "#c5cacf", "#ebeff3"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Raised Panel",
+        "canonical": "#151c24",
+        "tonalRamp": ["#090b0f", "#21262b", "#3d434a", "#5a626b", "#7b838d", "#9fa6ae", "#c4cad1", "#eaeff4"]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Panel Raised",
+        "canonical": "#1a222c",
+        "tonalRamp": ["#080b0f", "#21262c", "#3c434b", "#59626d", "#7a838f", "#9ea6b0", "#c3cad2", "#eaeff5"]
+      },
+      "surface-3": {
+        "role": "neutral",
+        "displayName": "Panel Highest",
+        "canonical": "#202935",
+        "tonalRamp": ["#080b10", "#20252d", "#3b434d", "#59626f", "#798391", "#9da6b2", "#c3cad3", "#e9eff6"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#242f3d",
+        "tonalRamp": ["#070b11", "#1f262e", "#3a434e", "#576271", "#788493", "#9ca6b3", "#c1cad5", "#e9eff8"]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "#32404f",
+        "tonalRamp": ["#070c11", "#1e262e", "#38434f", "#556372", "#768494", "#9aa7b4", "#c0cad6", "#e8eff8"]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "#e9edf2",
+        "tonalRamp": ["#0a0b0d", "#232527", "#404245", "#5e6165", "#7f8387", "#a2a5a9", "#c7c9cc", "#edeff1"]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Tinted Slate",
+        "canonical": "#9daaba",
+        "tonalRamp": ["#080b10", "#1f262d", "#3a434d", "#576270", "#788492", "#9ca6b2", "#c2cad4", "#e9eff7"]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#7c8b9b",
+        "tonalRamp": ["#070c11", "#1e262e", "#39434e", "#566371", "#768493", "#9ba6b3", "#c1cad5", "#e8eff7"]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Signal Amber",
+        "canonical": "#e5a33d",
+        "tonalRamp": ["#160700", "#352000", "#5a3b05", "#835703", "#af7505", "#cc9b55", "#eac28b", "#feebd4"]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Signal Amber Lift",
+        "canonical": "#f0b356",
+        "tonalRamp": ["#160700", "#352000", "#5a3b00", "#815811", "#ab7719", "#c99c5a", "#e8c28f", "#feecd2"]
+      },
+      "accent-ink": {
+        "role": "on-primary",
+        "displayName": "Amber Ink",
+        "canonical": "#191104",
+        "tonalRamp": ["#0e0b06", "#29241c", "#484135", "#696051", "#8b8171", "#aca496", "#cfc8bd", "#f3eee5"]
+      },
+      "accent-soft": {
+        "role": "primary-soft",
+        "displayName": "Amber Wash",
+        "canonical": "rgba(229, 163, 61, 0.13)"
+      },
+      "ok": {
+        "role": "state-ok",
+        "displayName": "Working Green",
+        "canonical": "#43b97c",
+        "tonalRamp": ["#001004", "#012e18", "#074f2f", "#067446", "#2b9962", "#68b98a", "#9bdab3", "#cdfcde"]
+      },
+      "bad": {
+        "role": "state-bad",
+        "displayName": "Broken Red",
+        "canonical": "#e15b4f",
+        "tonalRamp": ["#210000", "#4c0303", "#781915", "#a83129", "#cf564b", "#eb8377", "#fbb5ab", "#ffe9e6"]
+      },
+      "bad-soft": {
+        "role": "state-bad-soft",
+        "displayName": "Red Wash",
+        "canonical": "rgba(225, 91, 79, 0.14)"
+      },
+      "bad-text": {
+        "role": "state-bad-text",
+        "displayName": "Soft-Red Legible",
+        "canonical": "#f08578",
+        "tonalRamp": ["#1f0000", "#45100c", "#6e2821", "#9b4138", "#c16358", "#de8c81", "#fab6ac", "#fee9e6"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The single intro line. One per view." },
+      "headline": { "displayName": "Headline", "purpose": "Section headings: results header, How it works." },
+      "title": { "displayName": "Title", "purpose": "Step headings inside How it works; footer wordmark." },
+      "body": { "displayName": "Body", "purpose": "Prose, subtitles, table cells, compact UI copy." },
+      "label": { "displayName": "Label", "purpose": "Uppercase table column headers only." },
+      "mono": { "displayName": "Mono Readout", "purpose": "Machine-produced strings: URLs, status codes, stat values, progress, limits, footer notes. Always tabular-nums." }
+    },
+    "shadows": [
+      {
+        "name": "panel-lift",
+        "value": "0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.25)",
+        "purpose": "The only shadow token (--shadow). Seats raised panels (form card, summary panel, table container, suggestion dropdown) on the ground. Ambient and soft."
+      },
+      {
+        "name": "focus-glow",
+        "value": "0 0 0 3px rgba(229, 163, 61, 0.13)",
+        "purpose": "Text-entry focus ring; pairs with an amber border shift in place of the global 2px amber outline."
+      }
+    ],
+    "motion": [
+      { "name": "fade-in", "value": "fadeIn 0.35s ease (opacity 0 → 1, translateY 8px → 0)", "purpose": "The single orchestrated entrance; results container only." },
+      { "name": "progress-width", "value": "width 0.25s ease", "purpose": "Scan progress fill; also the health strip's width transition runs at 0.6s ease." },
+      { "name": "spin", "value": "spin 0.8s linear infinite", "purpose": "Primary-button loading spinner while a scan runs." },
+      { "name": "standard-ease", "value": "ease (default), 0.12–0.15s", "purpose": "State transitions: hover/focus colour, border, background changes." },
+      { "name": "reduced-motion", "value": "@media (prefers-reduced-motion: reduce) — all durations to 0.01ms, iteration-count 1", "purpose": "Load-bearing accessibility switch; collapses the whole motion budget." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one action per view: start the scan. Amber fill, ink label, 52px tall to match the URL field.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\"><span>Check links</span></button>",
+      "css": ".ds-btn-primary { height: 52px; padding: 0 1.6rem; background: var(--accent, #e5a33d); color: var(--accent-ink, #191104); border: none; border-radius: var(--radius, 10px); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.95rem; font-weight: 650; letter-spacing: -0.01em; cursor: pointer; display: inline-flex; align-items: center; gap: 0.6rem; transition: background 0.15s ease; } .ds-btn-primary:hover:not(:disabled) { background: var(--accent-hover, #f0b356); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #e5a33d); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Outline Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Export actions (JSON / CSV). Amber outline that inverts to full amber on hover.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Export JSON</button>",
+      "css": ".ds-btn-secondary { height: 40px; padding: 0 1.1rem; background: transparent; color: var(--accent, #e5a33d); border: 1px solid rgba(229, 163, 61, 0.45); border-radius: var(--radius-sm, 6px); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; } .ds-btn-secondary:hover { background: var(--accent, #e5a33d); border-color: var(--accent, #e5a33d); color: var(--accent-ink, #191104); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--accent, #e5a33d); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet utility action (e.g. Unhide all). Hairline border, slate text, brightens on hover.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\">Unhide all</button>",
+      "css": ".ds-btn-ghost { height: 36px; padding: 0 0.8rem; background: transparent; border: 1px solid var(--border-strong, #32404f); border-radius: var(--radius-sm, 6px); color: var(--text-secondary, #9daaba); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.8rem; font-weight: 550; cursor: pointer; transition: color 0.12s ease, border-color 0.12s ease; } .ds-btn-ghost:hover { color: var(--text, #e9edf2); border-color: var(--text-muted, #7c8b9b); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--accent, #e5a33d); outline-offset: 2px; border-radius: 6px; }"
+    },
+    {
+      "name": "URL Input",
+      "kind": "input",
+      "refersTo": "field-url",
+      "description": "The dominant element of the page: monospace URL entry in a recessed well with a drawn link glyph and amber caret.",
+      "html": "<div class=\"ds-url-wrap\"><svg class=\"ds-url-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/></svg><input class=\"ds-url-input\" type=\"text\" inputmode=\"url\" placeholder=\"www.example.com\" spellcheck=\"false\" aria-label=\"Website URL\"></div>",
+      "css": ".ds-url-wrap { position: relative; } .ds-url-icon { position: absolute; left: 0.95rem; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-muted, #7c8b9b); pointer-events: none; } .ds-url-input { width: 100%; height: 52px; padding: 0 1rem 0 2.6rem; background: var(--surface-2, #1a222c); border: 1px solid var(--border-strong, #32404f); border-radius: var(--radius, 10px); color: var(--text, #e9edf2); font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace; font-size: 0.95rem; caret-color: var(--accent, #e5a33d); transition: border-color 0.15s ease, box-shadow 0.15s ease; } .ds-url-input::placeholder { color: var(--text-muted, #7c8b9b); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-url-input:focus { outline: none; border-color: var(--accent, #e5a33d); box-shadow: 0 0 0 3px rgba(229, 163, 61, 0.13); }"
+    },
+    {
+      "name": "Segmented Filter",
+      "kind": "chip",
+      "refersTo": "segment-active",
+      "description": "Link-type filter (All / Internal / External). Active segment is the one amber chip in the world.",
+      "html": "<div class=\"ds-segmented\" role=\"group\" aria-label=\"Filter by link type\"><button class=\"ds-filter is-active\" type=\"button\">All</button><button class=\"ds-filter\" type=\"button\">Internal</button><button class=\"ds-filter\" type=\"button\">External</button></div>",
+      "css": ".ds-segmented { display: inline-flex; background: var(--surface-2, #1a222c); border: 1px solid var(--border-strong, #32404f); border-radius: var(--radius-sm, 6px); padding: 3px; gap: 2px; } .ds-filter { padding: 0.32rem 0.75rem; border: none; background: transparent; color: var(--text-secondary, #9daaba); border-radius: 4px; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.8rem; font-weight: 550; transition: background 0.12s ease, color 0.12s ease; } .ds-filter:hover { color: var(--text, #e9edf2); } .ds-filter.is-active { background: var(--accent, #e5a33d); color: var(--accent-ink, #191104); } .ds-filter:focus-visible { outline: 2px solid var(--accent, #e5a33d); outline-offset: 2px; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "HTTP status in the results table. Default: red wash; the 404 variant flips to amber wash as emphasis.",
+      "html": "<span class=\"ds-badge\">500</span> <span class=\"ds-badge ds-badge--404\">404</span>",
+      "css": ".ds-badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 999px; font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace; font-size: 0.72rem; font-weight: 600; font-variant-numeric: tabular-nums; background: var(--bad-soft, rgba(225, 91, 79, 0.14)); color: #f08578; white-space: nowrap; } .ds-badge--404 { background: var(--accent-soft, rgba(229, 163, 61, 0.13)); color: var(--accent, #e5a33d); }"
+    },
+    {
+      "name": "Summary Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Scan summary: 4-up mono stat row (pages / links / broken / working) above the link-health strip.",
+      "html": "<div class=\"ds-panel\" aria-label=\"Scan summary\"><div class=\"ds-summary-grid\"><div class=\"ds-stat\"><div class=\"ds-stat-value\">12</div><div class=\"ds-stat-label\">Pages scanned</div></div><div class=\"ds-stat\"><div class=\"ds-stat-value\">214</div><div class=\"ds-stat-label\">Unique links</div></div><div class=\"ds-stat\"><div class=\"ds-stat-value ds-stat-broken\">3</div><div class=\"ds-stat-label\">Broken</div></div><div class=\"ds-stat\"><div class=\"ds-stat-value ds-stat-working\">211</div><div class=\"ds-stat-label\">Working</div></div></div></div>",
+      "css": ".ds-panel { background: var(--surface, #151c24); border: 1px solid var(--border, #242f3d); border-radius: var(--radius, 10px); box-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.25); padding: 1.1rem 1.25rem 0.9rem; } .ds-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); } .ds-stat { padding: 0.15rem 1.25rem 0.9rem; border-left: 1px solid var(--border, #242f3d); } .ds-stat:first-child { border-left: none; padding-left: 0; } .ds-stat-value { font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; color: var(--text, #e9edf2); } .ds-stat-broken { color: var(--bad, #e15b4f); } .ds-stat-working { color: var(--ok, #43b97c); } .ds-stat-label { color: var(--text-secondary, #9daaba); font-size: 0.78rem; margin-top: 0.15rem; }"
+    },
+    {
+      "name": "Link Health Strip",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "Signature move. Full-width segmented pill encoding the working-vs-broken share of checked links — data, not ornament.",
+      "html": "<div class=\"ds-health\" aria-hidden=\"true\"><div class=\"ds-health-seg ds-health-working\" style=\"width: 98.6%\"></div><div class=\"ds-health-seg ds-health-broken\" style=\"width: 1.4%\"></div></div><div class=\"ds-health-legend\"><span class=\"ds-health-key\"><i class=\"ds-dot ds-dot-ok\"></i>Working</span><span class=\"ds-health-key\"><i class=\"ds-dot ds-dot-bad\"></i>Broken</span><span class=\"ds-health-caption\">99% of 214 links healthy</span></div>",
+      "css": ".ds-health { display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--surface-3, #202935); } .ds-health-seg { height: 100%; transition: width 0.6s ease; } .ds-health-working { background: var(--ok, #43b97c); } .ds-health-broken { background: var(--bad, #e15b4f); } .ds-health-legend { display: flex; gap: 1.1rem; margin-top: 0.55rem; font-size: 0.74rem; color: var(--text-secondary, #9daaba); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-health-key { display: inline-flex; align-items: center; gap: 0.35rem; } .ds-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; } .ds-dot-ok { background: var(--ok, #43b97c); } .ds-dot-bad { background: var(--bad, #e15b4f); } .ds-health-caption { margin-left: auto; color: var(--text-muted, #7c8b9b); font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Dark Instrument",
+    "overview": "A precision work surface for one job: paste a URL, watch the scan, work the dead-link list, export it. The world is a cool, dim ink ground lifted one tonal step at a time — panels, tracks, wells — never by decoration. There is exactly one voice of warmth: signal amber, spent on the things you can act on (the primary button, focus, selection, the active filter, key emphasis). Everything the machine produced reads as instrument output: URLs, status codes, counters, progress, and footnotes set in a monospace with tabular figures. Nothing here performs; it reports.\n\nThe build confirms the refusal stated up front. No purple-gradient SaaS template, no terminal-hacker costume, no hero-scale marketing type, no faux-proof. Density is moderate — one screen teaches the whole job — and the motion budget is nearly zero: a single orchestrated fade when results land, the progress bar's width transition, the health strip's width easing, and a spinner while scanning. Red and green exist only to say broken or working; they are never decoration.",
+    "keyCharacteristics": [
+      "Cool dark ink ground; depth built from one-step-lighter panels and 1px hairline borders, plus a soft two-layer ambient shadow on raised panels",
+      "Warm off-white text, tinted slate greys for secondary and muted roles",
+      "A single signal-amber accent (#e5a33d) held in reserve for action and emphasis — rarity is the point",
+      "ui-monospace with tabular figures for everything machine-produced: URLs, status codes, stat values, progress readout, limits line, footer notes",
+      "Signature move: the full-width segmented link-health strip in the results summary — working vs broken share of checked links, encoded as data, not ornament",
+      "Drawn stroke SVG icons throughout; no emoji, no icon font, no raster imagery (favicon is an inline SVG data URI)",
+      "Browser surfaces themed: ::selection, :focus-visible, caret, webkit scrollbars, color-scheme: dark"
+    ],
+    "rules": [
+      { "name": "The One Signal Rule", "body": "Amber is the only warm saturated hue on screen at rest, and it stays under roughly a tenth of any view. If amber appears twice in one glance, one of them is decoration — remove it.", "section": "colors" },
+      { "name": "The State-Only Rule", "body": "Red and green are reserved words. They mean broken and working. They never brand, decorate, or accent anything that is not a link's health, a destructive hover, or an error. The 404 badge is the single sanctioned exception: amber, because it is the most common finding and is treated as emphasis, not failure.", "section": "colors" },
+      { "name": "The Warm-on-Cool Rule", "body": "All text is warm-off-white on cool slate. Never introduce a pure white (#fff) or a blue-tinted text; the temperature split is the system's whole mood.", "section": "colors" },
+      { "name": "The Readout Rule", "body": "If a string was produced by the machine — a URL, an HTTP status, a count, a percentage, a timestamp, a limit — it is monospace with tabular figures. Sans never carries data.", "section": "typography" },
+      { "name": "The One-Line Rule", "body": "One heading level does one job: display introduces the tool, headline labels a section, title labels a step. No skipped levels, no display type below the intro.", "section": "typography" },
+      { "name": "The One Canvas Rule", "body": "One column, one width. No multi-column marketing layouts, no sidebars, no masonry — the tool is a single instrument panel.", "section": "layout" },
+      { "name": "The One-Step Rule", "body": "Depth is one tonal step and a hairline, everywhere. A surface rises by going lighter, never by gaining a stroke heavier than 1px (border-strong only for interactive affordance).", "section": "elevation" },
+      { "name": "The No-Hard-Shadow Rule", "body": "No offset or hard-edged shadows anywhere. The world is a dim room, not a cut-paper collage.", "section": "elevation" },
+      { "name": "The Hairline Rule", "body": "Every boundary is a 1px hairline in Hairline or Strong Hairline; the only filled boundaries are amber (active filter segment) or the pill clips of data visualisation.", "section": "shapes" },
+      { "name": "The Pill-Is-Data Rule", "body": "Fully rounded 999px shapes are reserved for data — progress, health strip, badges, dots, scrollbars — never for buttons. Buttons stay at 6–10px.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do spend amber only on the One Signal list: primary action, focus ring, selection, active filter, 404 badge, broken-link URLs, key emphasis. If it isn't one of those, it isn't amber.",
+      "Do set every machine-produced string in ui-monospace with font-variant-numeric: tabular-nums (The Readout Rule).",
+      "Do build depth from the tonal ladder + 1px hairlines; reach for --shadow only on raised panels and the suggestion dropdown (The One-Step Rule).",
+      "Do keep red and green strictly as broken/working state (The State-Only Rule) — including hovers on destructive controls.",
+      "Do keep :focus-visible as a 2px amber outline with 2px offset everywhere outside text-entry surfaces; keep color-scheme: dark, themed ::selection, amber caret, and webkit scrollbars as shipped.",
+      "Do respect prefers-reduced-motion: reduce — it is load-bearing, not decorative."
+    ],
+    "donts": [
+      "Don't use amber as a decorative wash, gradient, or background block — there are no gradients anywhere in this world, and there shouldn't be.",
+      "Don't introduce a second accent hue, or promote red/green to brand colours.",
+      "Don't set data in the sans stack, or prose in the mono stack.",
+      "Don't add hard offset shadows, glows, or neobrutalist strokes — depth is tonal, and shadows are ambient and two-layer soft (The No-Hard-Shadow Rule).",
+      "Don't use emoji or icon fonts; icons are drawn 1.7–1.8 stroke-width SVG, aria-hidden, sized 15–34px.",
+      "Don't add a second breakpoint or reflow the results table into cards; below 860px it scrolls horizontally inside its container.",
+      "Don't invent proof — no user counts, testimonials, uptime claims, or certifications anywhere in this world."
+    ]
+  }
+}
